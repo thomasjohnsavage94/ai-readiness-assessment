@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Readiness Assessment</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Roboto&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; background: linear-gradient(135deg, #E6F0FA 0%, #FFFFFF 100%); color: #333; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; background: #FFF; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
+        .logo { font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 700; color: #00C4B4; }
+        nav a { margin-left: 20px; text-decoration: none; color: #333; font-size: 16px; }
+        nav a:hover { color: #00C4B4; }
+        .section { display: none; max-width: 800px; margin: 50px auto; padding: 30px; background: #FFF; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
+        .section.active { display: block; }
+        h1 { font-family: 'Poppins', sans-serif; font-size: 28px; color: #333; margin-bottom: 10px; }
+        h2 { font-family: 'Poppins', sans-serif; font-size: 20px; color: #00C4B4; margin: 20px 0 10px; }
+        p { font-size: 16px; color: #666; margin-bottom: 20px; }
+        label { font-size: 14px; color: #333; margin-bottom: 5px; display: block; }
+        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #DDD; border-radius: 5px; font-size: 16px; }
+        input::placeholder, textarea::placeholder { color: #888; }
+        textarea { resize: vertical; min-height: 100px; }
+        button { padding: 12px; background: #00C4B4; color: #FFF; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; transition: transform 0.2s; }
+        button:hover { transform: scale(1.05); }
+        .progress-bar { width: 100%; height: 5px; background: #E6F0FA; margin-top: 20px; border-radius: 5px; overflow: hidden; }
+        .progress { height: 100%; background: #00C4B4; transition: width 0.5s ease; }
+        .question { margin-bottom: 20px; }
+        .radar-chart-container { width: 100%; max-width: 500px; margin: 20px auto; }
+        .buttons { display: flex; gap: 10px; }
+        .buttons button { flex: 1; }
+        .category { margin-bottom: 25px; }
+        .category p { margin: 5px 0; }
+        .category strong { color: #333; }
+        .improvement-list { list-style-type: disc; padding-left: 20px; font-size: 15px; color: #666; }
+        .improvement-list li { margin-bottom: 10px; }
+        @media (max-width: 600px) {
+            header { flex-direction: column; padding: 15px; }
+            nav { margin-top: 10px; }
+            .section { margin: 20px; padding: 20px; }
+            h1 { font-size: 24px; }
+            h2 { font-size: 18px; }
+            .radar-chart-container { max-width: 300px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">AI Readiness Assessment</div>
+        <nav>
+            <a href="#" onclick="showSection('home')">Home</a>
+            <a href="#">About</a>
+            <a href="#" onclick="showSection('resources')">Resources</a>
+            <a href="#">Contact</a>
+        </nav>
+    </header>
+
+    <!-- Home Section -->
+    <div id="home" class="section active">
+        <h1>Is Your Business Ready for AI?</h1>
+        <p>Take our comprehensive 15-minute assessment to evaluate your readiness and get tailored recommendations!</p>
+        <button onclick="showSection('customer-details')">Start Now</button>
+    </div>
+
+    <!-- Customer Details Section -->
+    <div id="customer-details" class="section">
+        <h1>Tell Us About Your Business</h1>
+        <p>Provide detailed information to personalize your AI readiness report.</p>
+        <form id="details-form" onsubmit="event.preventDefault(); saveDetails(); showSection('q1');">
+            <label>Company Name</label><input type="text" id="company-name" placeholder="e.g., ABC Innovations" required>
+            <label>Company Industry</label>
+            <select id="industry" required>
+                <option value="" disabled selected>Select an industry</option>
+                <option value="retail">Retail</option>
+                <option value="services">Professional Services</option>
+                <option value="manufacturing">Manufacturing</option>
+                <option value="healthcare">Healthcare</option>
+                <option value="technology">Technology</option>
+                <option value="finance">Finance</option>
+                <option value="education">Education</option>
+                <option value="other">Other</option>
+            </select>
+            <label>Employee Count</label>
+            <select id="employees" required>
+                <option value="" disabled selected>Select range</option>
+                <option value="1-10">1-10</option>
+                <option value="11-50">11-50</option>
+                <option value="51-200">51-200</option>
+                <option value="201-500">201-500</option>
+                <option value="501-1000">501-1,000</option>
+                <option value="1001-5000">1,001-5,000</option>
+                <option value="over-5000">Over 5,000</option>
+            </select>
+            <label>Annual Revenue (Optional)</label>
+            <select id="revenue">
+                <option value="" disabled selected>Select range</option>
+                <option value="under-100k">Under $100K</option>
+                <option value="100k-500k">$100K-$500K</option>
+                <option value="500k-1m">$500K-$1M</option>
+                <option value="1m-5m">$1M-$5M</option>
+                <option value="5m-10m">$5M-$10M</option>
+                <option value="10m-50m">$10M-$50M</option>
+                <option value="over-50m">Over $50M</option>
+            </select>
+            <label>Contact Name</label><input type="text" id="contact-name" placeholder="e.g., John Smith" required>
+            <label>Email</label><input type="email" id="email" placeholder="e.g., john@abcinnovations.com" required>
+            <label>Phone Number</label><input type="tel" id="phone" placeholder="e.g., (123) 456-7890" required>
+            <label>Business Address</label><textarea id="address" placeholder="e.g., 456 Tech Lane, Suite 100, Austin, TX" required></textarea>
+            <label>Company Website (Optional)</label><input type="url" id="website" placeholder="e.g., https://www.abcinnovations.com">
+            <button type="submit">Next: Begin Assessment</button>
+        </form>
+        <div class="progress-bar"><div class="progress" style="width: 10%;"></div></div>
+    </div>
+
+    <!-- Questionnaire Sections -->
+    <div id="q1" class="section">
+        <h1>Step 1 of 5: Strategic Goals</h1>
+        <form id="q1-form" onsubmit="event.preventDefault(); calculateScore('q1'); showSection('q2');">
+            <div class="question"><label>What are your top two business priorities for the next 12 months?</label><select name="q1-1" required><option value="3">Cost reduction & efficiency</option><option value="3">Revenue growth & market expansion</option><option value="2">Customer retention & satisfaction</option><option value="1">Innovation & product development</option><option value="0">Other</option></select></div>
+            <div class="question"><label>How many repetitive tasks could be automated (e.g., data entry, scheduling)?</label><select name="q1-2" required><option value="3">5+ tasks</option><option value="2">2-4 tasks</option><option value="1">1 task</option><option value="0">None identified</option></select></div>
+            <div class="question"><label>How often do you use data analytics to guide decisions?</label><select name="q1-3" required><option value="3">Regularly (weekly or more)</option><option value="2">Occasionally (monthly)</option><option value="1">Rarely (quarterly or less)</option><option value="0">Never</option></select></div>
+            <div class="question"><label>Do you have a clear AI adoption strategy?</label><select name="q1-4" required><option value="3">Yes, fully defined</option><option value="2">In development</option><option value="1">Vague ideas</option><option value="0">No strategy</option></select></div>
+            <button type="submit">Next</button>
+        </form>
+        <div class="progress-bar"><div class="progress" style="width: 20%;"></div></div>
+    </div>
+
+    <div id="q2" class="section">
+        <h1>Step 2 of 5: Technology Infrastructure</h1>
+        <form id="q2-form" onsubmit="event.preventDefault(); calculateScore('q2'); showSection('q3');">
+            <div class="question"><label>What percentage of your operations use cloud-based software?</label><select name="q2-1" required><option value="3">75-100%</option><option value="2">50-74%</option><option value="1">25-49%</option><option value="0">Under 25%</option></select></div>
+            <div class="question"><label>How reliable is your internet connectivity?</label><select name="q2-2" required><option value="3">99% uptime</option><option value="2">90-98% uptime</option><option value="1">80-89% uptime</option><option value="0">Below 80%</option></select></div>
+            <div class="question"><label>Do you have IT staff or external support?</label><select name="q2-3" required><option value="3">Dedicated IT team</option><option value="2">Part-time IT or external vendor</option><option value="1">Ad-hoc support</option><option value="0">No support</option></select></div>
+            <div class="question"><label>Are your systems scalable for AI tools?</label><select name="q2-4" required><option value="3">Yes, fully scalable</option><option value="2">Partially scalable</option><option value="1">Not sure</option><option value="0">Not scalable</option></select></div>
+            <div class="buttons"><button type="submit">Next</button><button onclick="showSection('q1')">Back</button></div>
+        </form>
+        <div class="progress-bar"><div class="progress" style="width: 40%;"></div></div>
+    </div>
+
+    <div id="q3" class="section">
+        <h1>Step 3 of 5: Data Readiness</h1>
+        <form id="q3-form" onsubmit="event.preventDefault(); calculateScore('q3'); showSection('q4');">
+            <div class="question"><label>What types of customer data do you collect?</label><select name="q3-1" required><option value="3">Detailed (e.g., behavior, preferences)</option><option value="2">Basic (e.g., contact info)</option><option value="1">Minimal</option><option value="0">None</option></select></div>
+            <div class="question"><label>How centralized is your data storage?</label><select name="q3-2" required><option value="3">Fully centralized (e.g., CRM, ERP)</option><option value="2">Partially centralized</option><option value="1">Scattered across systems</option><option value="0">Paper-based or unorganized</option></select></div>
+            <div class="question"><label>Do you ensure data quality (e.g., accuracy, updates)?</label><select name="q3-3" required><option value="3">Yes, proactively managed</option><option value="2">Occasionally reviewed</option><option value="1">Rarely checked</option><option value="0">No process</option></select></div>
+            <div class="question"><label>Are you compliant with data regulations (e.g., GDPR, CCPA)?</label><select name="q3-4" required><option value="3">Fully compliant</option><option value="2">Mostly compliant</option><option value="1">Unsure</option><option value="0">Not compliant</option></select></div>
+            <div class="buttons"><button type="submit">Next</button><button onclick="showSection('q2')">Back</button></div>
+        </form>
+        <div class="progress-bar"><div class="progress" style="width: 60%;"></div></div>
+    </div>
+
+    <div id="q4" class="section">
+        <h1>Step 4 of 5: Budget & Investment</h1>
+        <form id="q4-form" onsubmit="event.preventDefault(); calculateScore('q4'); showSection('q5');">
+            <div class="question"><label>Do you have a budget allocated for technology upgrades?</label><select name="q4-1" required><option value="3">Yes, significant budget</option><option value="2">Yes, moderate budget</option><option value="1">Limited budget</option><option value="0">No budget</option></select></div>
+            <div class="question"><label>How much can you invest monthly in AI tools?</label><select name="q4-2" required><option value="3">$500+</option><option value="2">$200-$499</option><option value="1">$50-$199</option><option value="0">Under $50</option></select></div>
+            <div class="question"><label>Have you invested in tech in the past year?</label><select name="q4-3" required><option value="3">Yes, over $10K</option><option value="2">$1K-$10K</option><option value="1">Under $1K</option><option value="0">No investment</option></select></div>
+            <div class="question"><label>Are you open to long-term ROI from AI?</label><select name="q4-4" required><option value="3">Yes, 2+ years</option><option value="2">1-2 years</option><option value="1">6-12 months</option><option value="0">Short-term only</option></select></div>
+            <div class="buttons"><button type="submit">Next</button><button onclick="showSection('q3')">Back</button></div>
+        </form>
+        <div class="progress-bar"><div class="progress" style="width: 80%;"></div></div>
+    </div>
+
+    <div id="q5" class="section">
+        <h1>Step 5 of 5: Workforce Skills</h1>
+        <form id="q5-form" onsubmit="event.preventDefault(); calculateScore('q5'); showResults();">
+            <div class="question"><label>What percentage of your staff is comfortable with digital tools?</label><select name="q5-1" required><option value="3">75-100%</option><option value="2">50-74%</option><option value="1">25-49%</option><option value="0">Under 25%</option></select></div>
+            <div class="question"><label>Have employees received AI or tech training?</label><select name="q5-2" required><option value="3">Yes, formal training</option><option value="2">Informal/self-taught</option><option value="1">Minimal training</option><option value="0">No training</option></select></div>
+            <div class="question"><label>Do you have staff capable of managing AI tools?</label><select name="q5-3" required><option value="3">Yes, multiple staff</option><option value="2">1-2 staff</option><option value="1">Possibly, with training</option><option value="0">No staff</option></select></div>
+            <div class="question"><label>Is your team open to adopting AI?</label><select name="q5-4" required><option value="3">Very enthusiastic</option><option value="2">Generally open</option><option value="1">Skeptical</option><option value="0">Resistant</option></select></div>
+            <div class="buttons"><button type="submit">Finish</button><button onclick="showSection('q4')">Back</button></div>
+        </form>
+        <div class="progress-bar"><div class="progress" style="width: 100%;"></div></div>
+    </div>
+
+    <!-- Results Dashboard -->
+    <div id="results" class="section">
+        <h1>Your AI Readiness Score</h1>
+        <p id="score-text" style="font-size: 20px; color: #00C4B4;"></p>
+        <div class="radar-chart-container">
+            <canvas id="radarChart"></canvas>
+        </div>
+
+        <div class="category">
+            <h2>Overall Assessment</h2>
+            <p><strong>Score:</strong> <span id="total-score"></span></p>
+            <p><strong>Level:</strong> <span id="readiness-level"></span></p>
+            <p><strong>Summary:</strong> <span id="summary"></span></p>
+        </div>
+
+        <div class="category">
+            <h2>1. Strategic Goals (<span id="q1-score"></span>/12)</h2>
+            <p><strong>Strengths:</strong> <span id="q1-strengths"></span></p>
+            <p><strong>Weaknesses:</strong> <span id="q1-weaknesses"></span></p>
+            <p><strong>How to Improve:</strong></p>
+            <ul class="improvement-list" id="q1-improvements"></ul>
+        </div>
+
+        <div class="category">
+            <h2>2. Technology Infrastructure (<span id="q2-score"></span>/12)</h2>
+            <p><strong>Strengths:</strong> <span id="q2-strengths"></span></p>
+            <p><strong>Weaknesses:</strong> <span id="q2-weaknesses"></span></p>
+            <p><strong>How to Improve:</strong></p>
+            <ul class="improvement-list" id="q2-improvements"></ul>
+        </div>
+
+        <div class="category">
+            <h2>3. Data Readiness (<span id="q3-score"></span>/12)</h2>
+            <p><strong>Strengths:</strong> <span id="q3-strengths"></span></p>
+            <p><strong>Weaknesses:</strong> <span id="q3-weaknesses"></span></p>
+            <p><strong>How to Improve:</strong></p>
+            <ul class="improvement-list" id="q3-improvements"></ul>
+        </div>
+
+        <div class="category">
+            <h2>4. Budget & Investment (<span id="q4-score"></span>/12)</h2>
+            <p><strong>Strengths:</strong> <span id="q4-strengths"></span></p>
+            <p><strong>Weaknesses:</strong> <span id="q4-weaknesses"></span></p>
+            <p><strong>How to Improve:</strong></p>
+            <ul class="improvement-list" id="q4-improvements"></ul>
+        </div>
+
+        <div class="category">
+            <h2>5. Workforce Skills (<span id="q5-score"></span>/12)</h2>
+            <p><strong>Strengths:</strong> <span id="q5-strengths"></span></p>
+            <p><strong>Weaknesses:</strong> <span id="q5-weaknesses"></span></p>
+            <p><strong>How to Improve:</strong></p>
+            <ul class="improvement-list" id="q5-improvements"></ul>
+        </div>
+
+        <div class="category">
+            <h2>Next Steps</h2>
+            <p><strong>Priority Actions:</strong> <span id="priority-actions"></span></p>
+            <p><strong>Timeline:</strong> <span id="timeline"></span></p>
+            <p><strong>Recommended Tools/Resources:</strong> <span id="recommended-tools"></span></p>
+        </div>
+
+        <div class="buttons">
+            <button onclick="showSection('report')">View Full Report</button>
+            <button onclick="showSection('resources')">Explore Resources</button>
+            <button onclick="showSection('home')">Retake Assessment</button>
+        </div>
+    </div>
+
+    <!-- Full Report -->
+    <div id="report" class="section">
+        <h1 id="report-title"></h1>
+        <p id="report-contact"></p>
+        <p id="report-score"></p>
+        <p><strong>1. Strategic Goals:</strong> <span id="report-goals"></span></p>
+        <p><strong>2. Technology Infrastructure:</strong> <span id="report-tech"></span></p>
+        <p><strong>3. Data Readiness:</strong> <span id="report-data"></span></p>
+        <p><strong>4. Budget & Investment:</strong> <span id="report-budget"></span></p>
+        <p><strong>5. Workforce Skills:</strong> <span id="report-skills"></span></p>
+        <div class="buttons">
+            <button onclick="downloadReport()">Download PDF</button>
+            <button onclick="showSection('results')">Back</button>
+        </div>
+    </div>
+
+    <!-- Resources -->
+    <div id="resources" class="section">
+        <h1>AI Resources</h1>
+        <p><strong>Free Tools:</strong> Google Analytics, Zapier, Tableau Public</p>
+        <p><strong>Training:</strong> Coursera AI for Everyone ($49), Udemy AI Basics ($20)</p>
+        <p><strong>Case Studies:</strong> "Retailer Boosts Sales 15% with AI Chatbots", "Manufacturer Cuts Downtime 25% with Predictive AI"</p>
+        <p><strong>Books:</strong> "AI Superpowers" by Kai-Fu Lee, "The AI Advantage" by Thomas Davenport</p>
+        <button onclick="showSection('results')">Back to Results</button>
+    </div>
+
+    <script>
+        let currentSection = 'home';
+        let details = {};
+        let scores = { q1: 0, q2: 0, q3: 0, q4: 0, q5: 0 };
+        let chartInstance = null;
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            currentSection = sectionId;
+        }
+
+        function saveDetails() {
+            details = {
+                companyName: document.getElementById('company-name').value,
+                industry: document.getElementById('industry').value,
+                employees: document.getElementById('employees').value,
+                revenue: document.getElementById('revenue').value || 'Not provided',
+                contactName: document.getElementById('contact-name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value,
+                website: document.getElementById('website').value || 'Not provided'
+            };
+        }
+
+        function calculateScore(formId) {
+            const form = document.getElementById(`${formId}-form`);
+            let score = 0;
+            form.querySelectorAll('select').forEach(select => score += parseInt(select.value));
+            scores[formId] = score;
+        }
+
+        function renderRadarChart() {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy(); // Destroy previous chart instance if exists
+
+            chartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Strategic Goals', 'Tech Infrastructure', 'Data Readiness', 'Budget & Investment', 'Workforce Skills'],
+                    datasets: [{
+                        label: 'Your AI Readiness',
+                        data: [scores.q1, scores.q2, scores.q3, scores.q4, scores.q5],
+                        backgroundColor: 'rgba(0, 196, 180, 0.2)',
+                        borderColor: '#00C4B4',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#00C4B4'
+                    }]
+                },
+                options: {
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 12,
+                            ticks: { stepSize: 3 }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'top' },
+                        title: { display: true, text: 'AI Readiness Breakdown', font: { size: 16 } }
+                    }
+                }
+            });
+        }
+
+        function showResults() {
+            const totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
+            const maxScore = 60;
+            let level = totalScore <= 20 ? 'AI Novice' : totalScore <= 40 ? 'AI-Curious' : totalScore <= 50 ? 'AI-Ready Beginner' : 'AI-Ready Leader';
+
+            // Overall Assessment
+            document.getElementById('score-text').textContent = `${totalScore}/${maxScore}`;
+            document.getElementById('total-score').textContent = `${totalScore}/${maxScore}`;
+            document.getElementById('readiness-level').textContent = level;
+            document.getElementById('summary').textContent = totalScore > 40 ? 
+                'You’re well-prepared to integrate AI, with solid strengths across most categories.' : 
+                'You’re starting your AI journey and can achieve readiness with focused effort.';
+
+            // Strategic Goals
+            document.getElementById('q1-score').textContent = scores.q1;
+            document.getElementById('q1-strengths').textContent = scores.q1 > 9 ? 
+                'Clear, actionable goals with a strong focus on automation and analytics.' : 
+                'Some alignment with AI-relevant objectives.';
+            document.getElementById('q1-weaknesses').textContent = scores.q1 < 6 ? 
+                'Undefined strategy and missed automation opportunities.' : 
+                'Goals need sharper AI focus.';
+            document.getElementById('q1-improvements').innerHTML = `
+                <li><strong>1-3 Months:</strong> Map 3-5 repetitive tasks (e.g., invoicing) for automation trials.</li>
+                <li><strong>4-6 Months:</strong> Draft an AI strategy tied to revenue or efficiency KPIs.</li>
+                <li><strong>7-12 Months:</strong> Implement weekly data reviews using tools like Google Data Studio.</li>
+            `;
+
+            // Technology Infrastructure
+            document.getElementById('q2-score').textContent = scores.q2;
+            document.getElementById('q2-strengths').textContent = scores.q2 > 9 ? 
+                'Advanced cloud usage and scalable systems primed for AI.' : 
+                'Functional baseline tech in place.';
+            document.getElementById('q2-weaknesses').textContent = scores.q2 < 6 ? 
+                'Outdated systems and poor connectivity block AI adoption.' : 
+                'Limited scalability or IT expertise.';
+            document.getElementById('q2-improvements').innerHTML = `
+                <li><strong>1-3 Months:</strong> Secure 95%+ internet uptime with a secondary ISP.</li>
+                <li><strong>4-6 Months:</strong> Shift 50% of workflows to cloud platforms like Microsoft Azure.</li>
+                <li><strong>7-12 Months:</strong> Contract an IT consultant for AI integration planning.</li>
+            `;
+
+            // Data Readiness
+            document.getElementById('q3-score').textContent = scores.q3;
+            document.getElementById('q3-strengths').textContent = scores.q3 > 9 ? 
+                'High-quality, centralized data ready for AI-driven insights.' : 
+                'Basic data collection established.';
+            document.getElementById('q3-weaknesses').textContent = scores.q3 < 6 ? 
+                'Fragmented, non-compliant data systems limit potential.' : 
+                'Data processes need refinement.';
+            document.getElementById('q3-improvements').innerHTML = `
+                <li><strong>1-3 Months:</strong> Adopt a free CRM like Zoho CRM to unify data.</li>
+                <li><strong>4-6 Months:</strong> Clean data monthly and document processes.</li>
+                <li><strong>7-12 Months:</strong> Ensure GDPR/CCPA compliance with legal review.</li>
+            `;
+
+            // Budget & Investment
+            document.getElementById('q4-score').textContent = scores.q4;
+            document.getElementById('q4-strengths').textContent = scores.q4 > 9 ? 
+                'Significant budget and long-term ROI mindset fuel AI success.' : 
+                'Some financial flexibility for tech.';
+            document.getElementById('q4-weaknesses').textContent = scores.q4 < 6 ? 
+                'Minimal funds and short-term focus stall progress.' : 
+                'Budget scaling is constrained.';
+            document.getElementById('q4-improvements').innerHTML = `
+                <li><strong>1-3 Months:</strong> Start with $50/month tools like ChatGPT Plus.</li>
+                <li><strong>4-6 Months:</strong> Budget $2K for a Q3 2025 tech upgrade.</li>
+                <li><strong>7-12 Months:</strong> Allocate $15K+ for AI platforms like IBM Watson.</li>
+            `;
+
+            // Workforce Skills
+            document.getElementById('q5-score').textContent = scores.q5;
+            document.getElementById('q5-strengths').textContent = scores.q5 > 9 ? 
+                'Skilled, eager team poised to adopt AI effectively.' : 
+                'Moderate digital comfort among staff.';
+            document.getElementById('q5-weaknesses').textContent = scores.q5 < 6 ? 
+                'Low skills and resistance threaten adoption.' : 
+                'AI-specific training is needed.';
+            document.getElementById('q5-improvements').innerHTML = `
+                <li><strong>1-3 Months:</strong> Enroll 20% of staff in free AI courses (e.g., Elements of AI).</li>
+                <li><strong>4-6 Months:</strong> Host a $300 AI training session via Udemy Business.</li>
+                <li><strong>7-12 Months:</strong> Designate an AI lead with advanced training (e.g., Coursera AI).</li>
+            `;
+
+            // Next Steps
+            document.getElementById('priority-actions').textContent = totalScore > 40 ? 
+                'Launch an AI pilot (e.g., customer service chatbot) to capitalize on your readiness.' : 
+                'Strengthen foundations: centralize data, boost tech reliability, and test low-cost AI.';
+            document.getElementById('timeline').textContent = totalScore > 40 ? 
+                'Q2 2025: Pilot AI; Q4 2025: Measure ROI and scale.' : 
+                'Q3 2025: Achieve foundational stability; Q1 2026: Begin AI adoption.';
+            document.getElementById('recommended-tools').textContent = totalScore > 40 ? 
+                'Salesforce Einstein ($50+/user/month), Tableau ($70/month), AWS SageMaker (custom pricing)' : 
+                'Zapier (free-$20/month), Google Analytics (free), Zoho CRM (free-$14/user/month)';
+
+            // Render the radar chart
+            renderRadarChart();
+            showSection('results');
+        }
+
+        function downloadReport() {
+            const totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
+            document.getElementById('report-title').textContent = `${details.companyName} - AI Readiness Report`;
+            document.getElementById('report-contact').textContent = `Prepared for: ${details.contactName} | ${details.email} | ${details.phone}`;
+            document.getElementById('report-score').textContent = `Overall Score: ${totalScore}/60`;
+            document.getElementById('report-goals').textContent = `${scores.q1}/12 - ${scores.q1 > 9 ? 'Excellent strategic alignment!' : 'Clarify AI goals.'}`;
+            document.getElementById('report-tech').textContent = `${scores.q2}/12 - ${scores.q2 > 9 ? 'Robust tech foundation!' : 'Upgrade infrastructure.'}`;
+            document.getElementById('report-data').textContent = `${scores.q3}/12 - ${scores.q3 > 9 ? 'Data-ready for AI!' : 'Centralize and clean data.'}`;
+            document.getElementById('report-budget').textContent = `${scores.q4}/12 - ${scores.q4 > 9 ? 'Well-funded for AI!' : 'Plan budget increases.'}`;
+            document.getElementById('report-skills').textContent = `${scores.q5}/12 - ${scores.q5 > 9 ? 'Skilled workforce!' : 'Invest in training.'}`;
+            showSection('report');
+            alert('PDF generation requires a library like jsPDF. This is a placeholder.');
+        }
+    </script>
+</body>
+</html>
